@@ -29,14 +29,14 @@ void setup() {
   //main_led_ChatGPT();
   
   
-  //init_vex_brain_serial();
+  init_vex_brain_serial();
   //led_setup();
   //init_encoders();
   init_led_timer();
   
   
   
-  //setup_otos();
+  setup_otos();
   
   //initialize_lox();
   //setup_VL53L0X();
@@ -51,8 +51,8 @@ void setup() {
 
   
   PORT->Group[1].DIRSET.reg = PORT_PB01; //set PB01 (LEDSTRIP3) to output
-  led_on(1);
-  led_setup();
+  //led_on(1);
+  //led_setup();
   
   //led_show();
   //do_one_led();
@@ -89,7 +89,7 @@ void loop() {
   while (1) {
     //Serial.print("hello\n");
     //led_show();
-    test_leds();
+    //test_leds();
     
     //set_otos_pos(2, 2, 2);
     if(led_counter == 10){
