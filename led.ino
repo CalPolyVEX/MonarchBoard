@@ -38,8 +38,6 @@ void initialize_color_array_states(){
 
 }
 
-
-
 void led_setup() {
   //initialize_color_array_states();
   FastLED.addLeds<WS2812B, 4, GRB>(leds, NUM_LEDS);  //add 10 LEDs to pin 0 (LEDSTRIP 3)
@@ -48,8 +46,9 @@ void led_setup() {
 
 }
 
-void test_leds(){
-  for (int i = 0; i < NUM_LEDS; i++){
+
+void test_leds() {
+  for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = CRGB::Blue;
     FastLED.show();
     delay(30);
@@ -191,6 +190,4 @@ void TC3_Handler(void) {
     //while (TC3->COUNT32.SYNCBUSY.bit.CC0) {}
   }
 }
-
-
 

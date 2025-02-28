@@ -22,8 +22,10 @@ void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(13, OUTPUT); //set LED2 pin to output
   pinMode(12, OUTPUT); //set LED1 pin to output
+  //digitalWrite(12, HIGH);
   pinMode(5, OUTPUT);  //set SERCOM1.0 to output
   Serial.begin(115200);
+
 
 
   //main_led_ChatGPT();
@@ -38,6 +40,7 @@ void setup() {
   
   setup_otos();
   
+
   //initialize_lox();
   //setup_VL53L0X();
   //set PA19 (SERCOM1.3) to input with pullup
@@ -49,10 +52,11 @@ void setup() {
     play_mario_theme2();
   }
 
-  
-  PORT->Group[1].DIRSET.reg = PORT_PB01; //set PB01 (LEDSTRIP3) to output
-  //led_on(1);
-  //led_setup();
+  PORT->Group[1].DIRSET.reg |= PORT_PB01; //set PB01 (LEDSTRIP3) to output
+  //PORT->Group[1].DIRSET.reg |= PORT_PB03;
+  //digitalWrite(13, LOW);
+  led_setup();
+
   
   //led_show();
   //do_one_led();
@@ -79,6 +83,7 @@ void loop() {
   int toggle = 0;
   int toggle2 = 1, toggle3 = 1;
   //uint8_t fake_buf[20];
+
 
   while (LED_DEBUG){
     led_on(1);
@@ -228,6 +233,7 @@ void loop() {
     }
     //Serial.println(num_error_counter);
   }
+
 
 }
 
