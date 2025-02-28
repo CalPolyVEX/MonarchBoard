@@ -8,7 +8,7 @@
 //  _FL_DEFPIN( 0, 3, 1); _FL_DEFPIN( 1, 2, 1);
 
 #include <FastLED.h>
-#define NUM_LEDS 10
+#define NUM_LEDS 1
 #define BRIGHTNESS 200
 CRGB leds[NUM_LEDS];
 
@@ -38,15 +38,23 @@ void initialize_color_array_states(){
 
 }
 
-
-
 void led_setup() {
-  initialize_color_array_states();
+  //initialize_color_array_states();
   FastLED.addLeds<WS2812B, 0, GRB>(leds, NUM_LEDS);  //add 10 LEDs to pin 0 (LEDSTRIP 1)
   FastLED.setBrightness(BRIGHTNESS);
 }
 
-
+void test_leds() {
+  leds[0] = CRGB::Blue;
+  FastLED.show();
+  delay(30);
+  /*
+  digitalWrite(12, HIGH);
+  delay(1000);
+  digitalWrite(12, LOW);
+  delay(1000);
+  */
+}
 
 void led_show() {
   int delay_time = 30;
@@ -183,3 +191,72 @@ void TC3_Handler(void) {
   }
 }
 
+// ChatGPT methods
+
+#include "sam.h" // Ensure this points to the right MCU header
+
+#define LED_PIN PORT_PB01 // Adjust this to match your pin mapping
+
+void delay_us(uint32_t us) {
+  for (volatile uint32_t i = 0; i < (us * (SystemCoreClock / 3000000)); i++);
+}
+
+void send_bit(int bit) {
+  if (bit) { // '1' bit
+    PORT->Group[1].OUTSET.reg = LED_PIN; // Set high
+    delay_us(0.8); // Hold high for 800 ns
+    PORT->Group[1].OUTCLR.reg = LED_PIN; // Set low
+    delay_us(0.45); // Hold low for 450 ns
+  } else { // '0' bit
+    PORT->Group[1].OUTSET.reg = LED_PIN; // Set high
+    delay_us(0.4); // Hold high for 400 ns
+    PORT->Group[1].OUTCLR.reg = LED_PIN; // Set low
+    delay_us(0.85); // Hold low for 850 ns
+  }
+}
+
+void send_byte(uint8_t byte) {
+  for (int i = 7; i >= 0; i--) {
+    send_bit((byte >> i) & 1); // Send each bit, MSB first
+  }
+}
+
+void send_color(uint8_t red, uint8_t green, uint8_t blue) {
+  send_byte(green); // WS2812 expects GRB format
+  send_byte(red);
+  send_byte(blue);
+  delay_us(50); // Latch data (minimum 50 µs reset time)
+}
+
+// Send color to only the first LED out of the strip of 144
+void send_color_to_one_led(uint8_t red, uint8_t green, uint8_t blue) {
+  // Send color data for the first LED
+  send_color(red, green, blue);
+
+  // Send 'off' (0, 0, 0) for the rest of the LEDs
+  for (int i = 1; i < 144; i++) {
+    send_color(0, 0, 0);
+  }
+
+  // Ensure data is latched
+  delay_us(50); // Minimum 50 µs reset time
+}
+
+void led_setup_ChatGPT() {
+  PORT->Group[1].DIRSET.reg |= LED_PIN; // Set PB01 as output
+}
+
+int main_led_ChatGPT() {
+  led_setup();
+  
+  while (1) {
+    send_color_to_one_led(255, 0, 0); // Red for the first LED only
+    delay_us(500000);                 // 500ms delay
+    
+    send_color_to_one_led(0, 255, 0); // Green for the first LED only
+    delay_us(500000);
+    
+    send_color_to_one_led(0, 0, 255); // Blue for the first LED only
+    delay_us(500000);
+  }
+}
