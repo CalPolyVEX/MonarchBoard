@@ -62,7 +62,10 @@ void serial_write_to_brain_buffer(uint8_t* data, int length) {
   delayMicroseconds(1);                      //allow the driver to enable
 
   for (int i=0; i<length; i++) {
-    while (!(SERCOM5->USART.INTFLAG.bit.DRE)); // Wait until Data Register Empty
+    while (!(SERCOM5->USART.INTFLAG.bit.DRE)){
+      // Wait until Data Register Empty
+    }
+     
     SERCOM5->USART.DATA.reg = data[i];         //write the data
   }
   
@@ -73,7 +76,9 @@ void serial_write_to_brain_buffer(uint8_t* data, int length) {
 // Function to read a single byte
 uint8_t serial_read_from_brain(void) {
   REG_PORT_OUTCLR0 = PORT_PA27;              //output low for receive
-  while (!(SERCOM5->USART.INTFLAG.bit.RXC)); // Wait until Receive Complete
+  while (!(SERCOM5->USART.INTFLAG.bit.RXC)){
+    // Wait until Receive Complete
+  }
   return SERCOM5->USART.DATA.reg;
 }
 

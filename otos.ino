@@ -45,7 +45,7 @@ void setup_otos()
   // Reset the tracking algorithm - this resets the position to the origin,
   // but can also be used to recover from some rare tracking errors
   otos.resetTracking();
-  otos.setLinearScalar(10.0f/(10.236585f));
+  otos.setLinearScalar(1.02161f);
 
 }
 
@@ -134,11 +134,25 @@ void get_otos_position(uint8_t* buf) {
   sfe_otos_pose2d_t myPosition;
   otos.getPosition(myPosition);
   
-  memcpy(buf, &myPosition.x, sizeof(float));        // Copy X value to buffer
-  memcpy(buf + sizeof(float), &myPosition.y, sizeof(float)); // Copy Y value to buffer
-  memcpy(buf + (2 * sizeof(float)), &myPosition.h, sizeof(float));
+  //myPosition.h = 90;
+  //myPosition.y = 20;
+  //myPosition.x = 10;
+
+  //memcpy(buf, &myPosition.x, sizeof(float));        // Copy X value to buffer
+  //memcpy(buf + sizeof(float), &myPosition.y, sizeof(float)); // Copy Y value to buffer
+  //memcpy(buf + (2 * sizeof(float)), &myPosition.h, sizeof(float));
+  
+  uint8_t* byteBuf = buf; 
+
+  float values[] = {myPosition.x, myPosition.y, myPosition.h};
+  for (size_t i = 0; i < 3; i++) {
+      float* floatPtr = (float*)(byteBuf + i * sizeof(float));
+      *floatPtr = values[i];
+  }
+
   // Wait a bit so we don't spam the serial port
-  //delay(500);
+  //delayMicroseconds(1000);
+  delay(1);
   
 
   // Alternatively, you can comment out the print and delay code above, and

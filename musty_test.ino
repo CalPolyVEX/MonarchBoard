@@ -8,6 +8,8 @@
 int num_bytes_received;  //number of bytes received from the VEX brain so far
 int num_error_counter = 0;  //number of data reception errors
 
+#define LED_DEBUG true
+
 void manage_led_commands(uint8_t val){
   if (val == 255){
     // do nothing. default value
@@ -16,18 +18,28 @@ void manage_led_commands(uint8_t val){
 
 // the setup function runs once when you press reset or power the board
 void setup() {
+
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(13, OUTPUT); //set LED2 pin to output
   pinMode(12, OUTPUT); //set LED1 pin to output
   pinMode(5, OUTPUT);  //set SERCOM1.0 to output
   Serial.begin(115200);
-  init_vex_brain_serial();
-  led_setup();
-  init_encoders();
+
+
+  //main_led_ChatGPT();
+  
+  
+  //init_vex_brain_serial();
+  //led_setup();
+  //init_encoders();
   init_led_timer();
-  setup_otos();
+  
+  
+  
+  //setup_otos();
+  
   //initialize_lox();
-  setup_VL53L0X();
+  //setup_VL53L0X();
   //set PA19 (SERCOM1.3) to input with pullup
   PORT->Group[0].PINCFG[19].reg |= PORT_PINCFG_INEN | PORT_PINCFG_PULLEN;
   REG_PORT_OUTSET0 = PORT_PA19;
@@ -37,26 +49,60 @@ void setup() {
     play_mario_theme2();
   }
 
+  
   PORT->Group[1].DIRSET.reg = PORT_PB01; //set PB01 (LEDSTRIP3) to output
-  //led_setup();
+  led_on(1);
+  led_setup();
   
   //led_show();
+  //do_one_led();
+  //led_off(1);
+  //led_blip();
+  Serial.print("INITIALIZED\n");
+
+  //led_blip();
 
   //offset_otos_with_lidar(true, 10, 3, 4, 50);
   
-  
+ 
 
 }
 
+int led_counter;
+
 // the loop function runs over and over again forever
 void loop() {  
+  
+  
+
   unsigned char buf[5];
   int toggle = 0;
   int toggle2 = 1, toggle3 = 1;
   //uint8_t fake_buf[20];
 
+  while (LED_DEBUG){
+    led_on(1);
+    delay(1000);
+    led_off(1);
+  }
+
   while (1) {
+    //Serial.print("hello\n");
+    //led_show();
+    test_leds();
     
+    //set_otos_pos(2, 2, 2);
+    if(led_counter == 10){
+      led_on(1);
+      led_counter = 0;
+    } else if (led_counter > 7) {
+      led_on(1);
+      led_counter++;
+    } else {
+      led_off(1);
+      led_counter++;
+    } 
+    send_otos_data();
     //TC3_Handler();
     //Serial.print("AaAAA");
     
@@ -135,18 +181,20 @@ void loop() {
         if (num_bytes_received == 2) { //if 2 total bytes were received from the brain
           
           //manage_led_commands(buf[1]);
-          Serial.print("buf[0]: ");
-          Serial.print(buf[0]);
-          Serial.print("buf[1]: ");
-          Serial.print(buf[1]);
-          Serial.println();
+          //Serial.print("buf[0]: ");
+          //Serial.print(buf[0]);
+          //Serial.print("buf[1]: ");
+          //Serial.print(buf[1]);
+          //Serial.println();
 
           if(buf[0] == 0){
             //red
-            set_otos_pos(0, 0, 180);
-          } else if (buf[0] == 255){
-            //blue
+            reinit_otos();
             set_otos_pos(0, 0, 0);
+          } else if (buf[0] == 255){
+            reinit_otos();
+            set_otos_pos(0, 0, 180);
+            
           }
           
           send_otos_data(); 
@@ -156,14 +204,15 @@ void loop() {
 
       } else if (buf[0] == 202){
         bool red = false;
+        //Serial.println("CLAIBRATING");
         if (num_bytes_received == 2){
-          Serial.println(buf[1]);
+          //Serial.println(buf[1]);
           if (buf[1] == 127){
             red = true;
-            set_otos_pos(0, 0, 180.0);
+            set_otos_pos(0, 0, 0.0);
           } else if (buf[1] == 255){
             red = false;
-            set_otos_pos(0, 0, 0.0);
+            set_otos_pos(0, 0, 180.0);
           }
         }
         

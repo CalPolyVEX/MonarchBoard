@@ -8,7 +8,7 @@
 //  _FL_DEFPIN( 0, 3, 1); _FL_DEFPIN( 1, 2, 1);
 
 #include <FastLED.h>
-#define NUM_LEDS 10
+#define NUM_LEDS 144
 #define BRIGHTNESS 200
 CRGB leds[NUM_LEDS];
 
@@ -41,11 +41,20 @@ void initialize_color_array_states(){
 
 
 void led_setup() {
-  initialize_color_array_states();
-  FastLED.addLeds<WS2812B, 0, GRB>(leds, NUM_LEDS);  //add 10 LEDs to pin 0 (LEDSTRIP 1)
+  //initialize_color_array_states();
+  FastLED.addLeds<WS2812B, 4, GRB>(leds, NUM_LEDS);  //add 10 LEDs to pin 0 (LEDSTRIP 3)
   FastLED.setBrightness(BRIGHTNESS);
+  
+
 }
 
+void test_leds(){
+  for (int i = 0; i < NUM_LEDS; i++){
+    leds[i] = CRGB::Blue;
+    FastLED.show();
+    delay(30);
+  }
+}
 
 
 void led_show() {
@@ -182,4 +191,6 @@ void TC3_Handler(void) {
     //while (TC3->COUNT32.SYNCBUSY.bit.CC0) {}
   }
 }
+
+
 
