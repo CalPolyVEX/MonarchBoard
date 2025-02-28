@@ -25,7 +25,7 @@ void setup() {
   //init_vex_brain_serial();
   //led_setup();
   //init_encoders();
-  init_led_timer();
+  //init_led_timer();
   //setup_otos();
   //digitalWrite(12, HIGH);
   //initialize_lox();
